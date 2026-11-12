@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import WorkspaceView from "./WorkspaceView";
 import {
   Activity, ArrowDownRight, ArrowRight, ArrowUpRight, Award, BookOpen,
   BriefcaseBusiness, Check, ChevronDown, ChevronRight, CircleHelp,
@@ -77,6 +78,7 @@ function App() {
         </header>
 
         <div className="dashboard-content">
+          {active !== "Command center" ? <WorkspaceView active={active} role={role} onRoleChange={setRole} /> : <>
           <section className="hero-heading">
             <div>
               <div className="overline"><span className="overline-mark"/> YOUR CAREER, WITH CLARITY</div>
@@ -133,6 +135,7 @@ function App() {
           </section>
 
           <footer className="dashboard-footer"><span><ShieldCheck size={14}/> Your journey. Your decisions. Your future.</span><span>CareerCompass AI <i/> Career guidance for exploration and learning</span></footer>
+          </>}
         </div>
       </main>
     </div>
