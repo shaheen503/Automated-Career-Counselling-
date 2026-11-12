@@ -1,64 +1,138 @@
 import { useMemo, useState } from "react";
 import {
-  ArrowUpRight, BookOpen, BriefcaseBusiness, ChartNoAxesCombined, Check,
-  ChevronRight, Compass, GraduationCap, LayoutDashboard, Lightbulb,
-  Menu, Search, Sparkles, Target, TrendingUp, X
+  Activity, ArrowDownRight, ArrowRight, ArrowUpRight, Award, BookOpen,
+  BriefcaseBusiness, Check, ChevronDown, ChevronRight, CircleHelp,
+  Compass, FileText, GraduationCap, LayoutDashboard, Menu, MessageSquare,
+  Search, Settings2, ShieldCheck, Sparkles, Target, TrendingUp, X, Globe2
 } from "lucide-react";
 
-type Career = { title: string; category: string; description: string; skills: string[]; fit: number; color: string };
-
-const careers: Career[] = [
-  { title: "Python Developer", category: "Software engineering", description: "Build backend services, APIs and automation using Python.", skills: ["Python", "SQL", "REST APIs", "Git"], fit: 92, color: "violet" },
-  { title: "Data Analyst", category: "Data & analytics", description: "Turn business data into clear insights and useful reports.", skills: ["SQL", "Excel", "Power BI", "Statistics"], fit: 86, color: "blue" },
-  { title: "Frontend Developer", category: "Software engineering", description: "Create accessible, responsive interfaces for web products.", skills: ["HTML", "CSS", "JavaScript", "React"], fit: 78, color: "amber" }
+const roles = ["Python Developer", "Data Analyst", "Frontend Developer", "Software Engineer"];
+const skillRows = [
+  { name: "Python & programming", value: 82, level: "Strong" },
+  { name: "SQL & databases", value: 68, level: "Building" },
+  { name: "Problem solving", value: 56, level: "Building" },
+  { name: "Communication", value: 44, level: "Focus area" }
 ];
-
-const navigation = [
-  { label: "Overview", icon: LayoutDashboard },
-  { label: "Explore careers", icon: Compass },
-  { label: "Skill roadmap", icon: Target },
-  { label: "Learning library", icon: BookOpen }
+const navItems = [
+  { label: "Command center", icon: LayoutDashboard },
+  { label: "Career explorer", icon: Compass },
+  { label: "Skill development", icon: Target },
+  { label: "Interview studio", icon: MessageSquare },
+  { label: "Resume workspace", icon: FileText }
 ];
 
 function App() {
-  const [active, setActive] = useState("Overview");
-  const [query, setQuery] = useState("");
+  const [active, setActive] = useState("Command center");
+  const [role, setRole] = useState(roles[0]);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [selected, setSelected] = useState("Python Developer");
-  const filtered = useMemo(() => careers.filter((career) =>
-    (career.title + career.category + career.skills.join(" ")).toLowerCase().includes(query.toLowerCase())
-  ), [query]);
-  const current = careers.find((career) => career.title === selected) ?? careers[0];
+  const [search, setSearch] = useState("");
+  const [showHelp, setShowHelp] = useState(false);
+
+  const filteredNav = useMemo(
+    () => navItems.filter(item => item.label.toLowerCase().includes(search.toLowerCase())),
+    [search]
+  );
 
   return (
-    <div className="app-shell">
+    <div className="career-app">
       <aside className={`sidebar ${menuOpen ? "sidebar-open" : ""}`}>
-        <div className="brand"><span className="brand-mark"><Compass size={21}/></span><span>career<span className="brand-accent">compass</span><small>CAREER INTELLIGENCE</small></span><button className="mobile-close" onClick={() => setMenuOpen(false)} aria-label="Close menu"><X/></button></div>
-        <div className="workspace-label">WORKSPACE</div>
-        <nav>{navigation.map(({label, icon: Icon}) => <button key={label} className={active === label ? "nav-item active" : "nav-item"} onClick={() => {setActive(label); setMenuOpen(false);}}><Icon size={18}/>{label}{label === "Skill roadmap" && <span className="nav-dot"/>}</button>)}</nav>
-        <div className="sidebar-bottom"><div className="help-card"><div className="help-icon"><Lightbulb size={18}/></div><strong>Not sure where to start?</strong><p>Explore career paths that match your interests.</p><button onClick={() => setActive("Explore careers")}>Explore paths <ArrowUpRight size={14}/></button></div><div className="profile"><div className="avatar">S</div><div><strong>Student workspace</strong><span>Career explorer</span></div><span className="online-dot"/></div></div>
+        <div className="brand-lockup">
+          <div className="brand-symbol"><Compass size={21}/></div>
+          <div className="brand-name">Career<span>Compass</span><small>CAREER INTELLIGENCE</small></div>
+          <button className="mobile-close" onClick={() => setMenuOpen(false)} aria-label="Close navigation"><X size={18}/></button>
+        </div>
+        <div className="side-caption">YOUR WORKSPACE</div>
+        <label className="side-search"><Search size={15}/><input value={search} onChange={e => setSearch(e.target.value)} placeholder="Find a workspace"/></label>
+        <nav className="side-nav">
+          {filteredNav.map(({label, icon: Icon}) => (
+            <button key={label} className={active === label ? "side-link selected" : "side-link"} onClick={() => {setActive(label); setMenuOpen(false);}}>
+              <Icon size={17}/><span>{label}</span>{active === label && <span className="active-marker"/>}
+            </button>
+          ))}
+          {filteredNav.length === 0 && <p className="nav-empty">No sections found.</p>}
+        </nav>
+        <div className="sidebar-spacer"/>
+        <div className="side-support">
+          <div className="support-icon"><CircleHelp size={17}/></div>
+          <strong>Need a little direction?</strong>
+          <p>Start with one small step. Your career plan can evolve as you do.</p>
+          <button onClick={() => setShowHelp(v => !v)}> {showHelp ? "Hide tips" : "View quick tips"} <ArrowUpRight size={14}/></button>
+          {showHelp && <div className="quick-tip">Choose a target role, review its skills, then create a small project to practise.</div>}
+        </div>
+        <div className="profile-row"><div className="profile-avatar">S</div><div className="profile-copy"><strong>My workspace</strong><span>Career explorer</span></div><button className="icon-button" aria-label="Workspace settings"><Settings2 size={16}/></button></div>
       </aside>
 
-      {menuOpen && <button className="scrim" onClick={() => setMenuOpen(false)} aria-label="Close navigation"/>}
-      <main className="main-area">
-        <header className="topbar"><button className="mobile-menu" onClick={() => setMenuOpen(true)} aria-label="Open menu"><Menu/></button><div className="breadcrumb">Workspace <ChevronRight size={14}/> <strong>{active}</strong></div><div className="top-actions"><span className="status-pill"><span/> Career discovery</span><div className="avatar top-avatar">S</div></div></header>
-        <div className="content">
-          <section className="welcome-row"><div><div className="eyebrow"><Sparkles size={14}/> YOUR NEXT CHAPTER STARTS HERE</div><h1>Find a career that <span>fits your potential.</span></h1><p className="welcome-copy">Explore possibilities, understand the skills that matter, and turn your goals into a practical plan.</p></div><div className="welcome-art"><div className="orbit orbit-one"/><div className="orbit orbit-two"/><div className="art-core"><Compass size={36}/></div><span className="art-star star-one">✳</span><span className="art-star star-two">✦</span></div></section>
+      {menuOpen && <button className="mobile-scrim" onClick={() => setMenuOpen(false)} aria-label="Close menu"/>}
+      <main className="main-panel">
+        <header className="topbar">
+          <div className="topbar-left">
+            <button className="mobile-menu" onClick={() => setMenuOpen(true)} aria-label="Open navigation"><Menu size={19}/></button>
+            <div className="crumb">Workspace <ChevronRight size={14}/><strong>{active}</strong></div>
+          </div>
+          <div className="topbar-right">
+            <span className="workspace-status"><span/> PERSONAL WORKSPACE</span>
+            <button className="icon-button notification" aria-label="Notifications"><Activity size={17}/><i/></button>
+            <div className="mini-avatar">S</div>
+          </div>
+        </header>
 
-          <section className="stats-grid">
-            <article className="stat-card"><div className="stat-top"><span>Career paths to explore</span><span className="stat-icon purple"><BriefcaseBusiness size={18}/></span></div><strong>12<span>+</span></strong><small>Across growing industries</small></article>
-            <article className="stat-card"><div className="stat-top"><span>Skills to build</span><span className="stat-icon cyan"><GraduationCap size={18}/></span></div><strong>24</strong><small>Practical learning topics</small></article>
-            <article className="stat-card"><div className="stat-top"><span>Your planning progress</span><span className="stat-icon green"><TrendingUp size={18}/></span></div><strong>01 <em>step</em></strong><small>Start with career discovery</small></article>
+        <div className="dashboard-content">
+          <section className="hero-heading">
+            <div>
+              <div className="overline"><span className="overline-mark"/> YOUR CAREER, WITH CLARITY</div>
+              <h1>Career Intelligence <span>Command Center</span></h1>
+              <p>A thoughtful space to explore career options, understand your skills, and plan your next move.</p>
+            </div>
+            <div className="hero-date"><span className="live-dot"/> YOUR JOURNEY STARTS HERE</div>
           </section>
 
-          <section className="section-heading"><div><div className="eyebrow">A PLACE TO BEGIN</div><h2>Explore career directions</h2><p>Sample career paths to help you get started. These are illustrative, not personal predictions.</p></div><div className="search-box"><Search size={17}/><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search roles or skills..."/></div></section>
-          <section className="career-grid">{filtered.map((career) => <article className="career-card" key={career.title}><div className="career-card-top"><span className={`career-symbol ${career.color}`}><BriefcaseBusiness size={19}/></span><span className="match-label">SAMPLE PATH</span></div><div className="career-category">{career.category}</div><h3>{career.title}</h3><p>{career.description}</p><div className="skill-list">{career.skills.map(skill => <span key={skill}>{skill}</span>)}</div><button className="card-link" onClick={() => {setSelected(career.title); setActive("Skill roadmap");}}>View skill roadmap <ArrowUpRight size={16}/></button></article>)}
-            {filtered.length === 0 && <div className="empty-state">No sample paths match “{query}”. Try another role or skill.</div>}
+          <section className="overview-grid">
+            <article className="goal-card">
+              <div className="card-kicker"><span className="tile-icon"><Target size={16}/></span> CAREER GOAL <span className="card-menu">•••</span></div>
+              <div className="goal-label">YOUR TARGET ROLE</div>
+              <h2>{role}</h2>
+              <p>Choose a direction to shape your skills and learning plan.</p>
+              <label className="role-select"><BriefcaseBusiness size={14}/><select value={role} onChange={e => setRole(e.target.value)}>{roles.map(item => <option key={item}>{item}</option>)}</select><ChevronDown size={13}/></label>
+            </article>
+
+            <article className="match-card">
+              <div className="card-kicker">CAREER READINESS <span className="card-menu">•••</span></div>
+              <div className="score-ring"><div className="score-inner"><strong>—</strong><span>Not assessed</span></div></div>
+              <div className="score-note"><Activity size={13}/> Complete your assessment to see your result</div>
+            </article>
+
+            <article className="skills-card">
+              <div className="card-kicker">SKILL GAP OVERVIEW <span className="card-menu">•••</span></div>
+              <p className="muted-intro">Illustrative skill profile — update after assessment</p>
+              <div className="skill-bars">{skillRows.map((item, index) => <div className="skill-row" key={item.name}><div className="skill-meta"><span>{item.name}</span><span>{item.level}</span></div><div className="bar-track"><span className={`bar-fill bar-${index}`} style={{width: item.value + "%"}}/></div></div>)}</div>
+              <div className="legend"><span><i className="legend-strong"/> Strong</span><span><i className="legend-grow"/> Building</span><span><i className="legend-focus"/> Focus area</span></div>
+            </article>
           </section>
 
-          <section className="bottom-grid"><article className="roadmap-panel"><div className="panel-heading"><div><div className="eyebrow">YOUR NEXT MOVE</div><h2>Build your learning roadmap</h2></div><span className="panel-icon"><Target size={20}/></span></div><p>Choose a career direction to see the foundational skills you can work on next.</p><div className="roadmap-select"><label htmlFor="career-select">Career direction</label><select id="career-select" value={selected} onChange={event => setSelected(event.target.value)}>{careers.map(c => <option key={c.title}>{c.title}</option>)}</select></div><div className="roadmap-skill"><span className="step-number">01</span><div><strong>Strengthen the foundations</strong><small>{current.skills.slice(0,2).join(" · ")}</small></div><span className="step-state"><Check size={14}/></span></div><div className="roadmap-skill"><span className="step-number">02</span><div><strong>Practice with a small project</strong><small>Build and document one practical project</small></div><ChevronRight size={17}/></div><div className="roadmap-skill"><span className="step-number">03</span><div><strong>Showcase your work</strong><small>Publish your project and explain your decisions</small></div><ChevronRight size={17}/></div></article>
-            <article className="insight-panel"><div className="insight-glow"/><div className="eyebrow"><Sparkles size={13}/> A BETTER WAY FORWARD</div><h2>Your career is a journey, not a single prediction.</h2><p>Use career suggestions as a starting point. Your interests, experience, and willingness to learn matter just as much.</p><div className="insight-footer"><span><ChartNoAxesCombined size={16}/> Explore. Learn. Grow.</span><ArrowUpRight size={19}/></div></article></section>
-          <footer>CareerCompass AI <span>·</span> Career guidance for exploration and learning <span className="footer-right">Recommendations are educational guidance, not guarantees.</span></footer>
+          <section className="middle-grid">
+            <article className="timeline-card">
+              <div className="section-title"><div><div className="overline">PLAN WITH PURPOSE</div><h2>Career path timeline</h2></div><span className="subtle-tag">SUGGESTED JOURNEY</span></div>
+              <div className="timeline">
+                <div className="timeline-step done"><span className="timeline-icon"><GraduationCap size={17}/></span><strong>Learn</strong><small>Build foundations</small></div>
+                <div className="timeline-connector"/>
+                <div className="timeline-step current"><span className="timeline-icon"><Activity size={17}/></span><strong>Practise</strong><small>Apply your skills</small></div>
+                <div className="timeline-connector"/>
+                <div className="timeline-step"><span className="timeline-icon"><BriefcaseBusiness size={17}/></span><strong>Showcase</strong><small>Build a portfolio</small></div>
+                <div className="timeline-connector"/>
+                <div className="timeline-step"><span className="timeline-icon"><Award size={17}/></span><strong>Apply</strong><small>Prepare for roles</small></div>
+              </div>
+            </article>
+            <article className="feature-card job-card"><div className="feature-head"><span className="feature-icon"><BriefcaseBusiness size={17}/></span><span className="subtle-tag">CAREER EXPLORATION</span></div><h3>Role discovery</h3><p>Compare career paths and understand what each role involves.</p><button onClick={() => setActive("Career explorer")}>Explore roles <ArrowUpRight size={15}/></button></article>
+            <article className="feature-card interview-card"><div className="feature-head"><span className="feature-icon"><MessageSquare size={17}/></span><span className="subtle-tag">PRACTICE SPACE</span></div><h3>Interview studio</h3><p>Prepare answers and practise explaining your projects clearly.</p><button onClick={() => setActive("Interview studio")}>Prepare now <ArrowUpRight size={15}/></button></article>
+          </section>
+
+          <section className="bottom-grid">
+            <article className="feature-card resume-card"><div className="feature-head"><span className="feature-icon"><FileText size={17}/></span><span className="subtle-tag">PROFILE TOOLKIT</span></div><h3>Resume workspace</h3><p>Organise your projects, skills and achievements for your next application.</p><button onClick={() => setActive("Resume workspace")}>Open workspace <ArrowUpRight size={15}/></button></article>
+            <article className="feature-card learning-card"><div className="feature-head"><span className="feature-icon"><BookOpen size={17}/></span><span className="subtle-tag">SKILL DEVELOPMENT</span></div><h3>Learning path</h3><p>Turn skill gaps into a manageable learning plan with practical milestones.</p><button onClick={() => setActive("Skill development")}>Build learning plan <ArrowUpRight size={15}/></button></article>
+            <article className="region-card"><div className="region-copy"><div className="feature-head"><span className="feature-icon"><Globe2 size={17}/></span><span className="subtle-tag">LOCATION CONTEXT</span></div><h3>Explore your job market</h3><p>Research roles, industries and opportunities in the regions you choose.</p><button onClick={() => setActive("Career explorer")}>View career explorer <ArrowUpRight size={14}/></button></div><div className="map-art" aria-hidden="true"><div className="map-grid"/><span className="map-pin pin-a"/><span className="map-pin pin-b"/><span className="map-pin pin-c"/><span className="map-pin pin-d"/></div></article>
+          </section>
+
+          <footer className="dashboard-footer"><span><ShieldCheck size={14}/> Your journey. Your decisions. Your future.</span><span>CareerCompass AI <i/> Career guidance for exploration and learning</span></footer>
         </div>
       </main>
     </div>
